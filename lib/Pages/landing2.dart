@@ -1,26 +1,44 @@
-// Landing / Onboarding UI moved from main.dart
 import 'package:flutter/material.dart';
-import 'landing2.dart';
 
-class OnboardingPage extends StatelessWidget {
-  const OnboardingPage({super.key});
+class LandingPage2 extends StatelessWidget {
+  const LandingPage2({super.key});
 
-  static const Color background = Color.fromARGB(255, 170, 201, 175); // green tone
+  static const Color background = Color.fromARGB(255, 103, 183, 122); 
 
   Widget _pageIndicators() {
-    Widget dot([bool active = false]) {
-      return Container(
-        width: active ? 22 : 8,
-        height: 8,
-        margin: const EdgeInsets.only(right: 8),
-        decoration: BoxDecoration(
-              color: active ? Colors.white : Color.fromRGBO(255, 255, 255, 0.4),
-          borderRadius: BorderRadius.circular(6),
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.4),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
         ),
-      );
-    }
-
-    return Row(children: [dot(true), dot(), dot()]);
+        const SizedBox(width: 8),
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.4),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -35,7 +53,7 @@ class OnboardingPage extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top row: page indicators + Skip
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -50,9 +68,9 @@ class OnboardingPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 42),
-                  // Heading
+
                   const Text(
-                    'Welcome to',
+                    'Check your',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 42,
@@ -61,19 +79,18 @@ class OnboardingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'SafeHome',
+                    'house safety easily.',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 52,
+                      fontSize: 42,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  // spacer to push content upward
                   const Expanded(child: SizedBox()),
                 ],
               ),
 
-              // Circular action button bottom-right (now a proper ElevatedButton)
+
               Positioned(
                 right: 12,
                 bottom: 12,
