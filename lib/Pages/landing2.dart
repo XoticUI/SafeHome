@@ -1,42 +1,29 @@
 import 'package:flutter/material.dart';
+import '../screens/home.dart';
 
 class LandingPage2 extends StatelessWidget {
   const LandingPage2({super.key});
 
-  static const Color background = Color.fromARGB(255, 103, 183, 122); 
+  static const Color background = Color.fromARGB(255, 103, 163, 183); 
 
   Widget _pageIndicators() {
+    Widget dot(bool active) => Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: active ? Colors.white : Color.fromRGBO(255, 255, 255, 0.4),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+        );
+
     return Row(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.4),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-        ),
+        dot(false),
         const SizedBox(width: 8),
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-        ),
+        dot(true),
         const SizedBox(width: 8),
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.4),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-        ),
+        dot(false),
       ],
     );
   }
@@ -100,7 +87,7 @@ class LandingPage2 extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).push(PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) => const LandingPage2(),
+                        pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
                         transitionsBuilder: (context, animation, secondaryAnimation, child) {
                           final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
                           final curved = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
