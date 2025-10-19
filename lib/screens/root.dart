@@ -110,14 +110,17 @@ class _RootScreenState extends State<RootScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => setState(() => _index = 1),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        backgroundColor: Colors.black87,
+                        onPressed: () => setState(() => _index = 1),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: Colors.black87,
+                        ),
+                        child: const Text('Start Safety Check', style: TextStyle(fontSize: 20, color: Colors.white)),
+                        // Text(label, style: TextStyle(color: selected ? Colors.black87 : Colors.grey[600])),
+  
+  
                       ),
-                      child: const Text('Start Safety Check', style: TextStyle(fontSize: 20)),
-                    ),
                   ),
                   const SizedBox(height: 18),
                   Card(
