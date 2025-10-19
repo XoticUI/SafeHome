@@ -48,7 +48,10 @@ class AppState extends ChangeNotifier {
     ]);
 
     reminders.addAll([
-      Reminder(id: 'r1', text: 'Change smoke alarm batteries (monthly)'),
+      Reminder(id: 'r1', text: 'Test smoke alarms', frequency: 'Monthly', dueDate: DateTime(2025, 10, 31)),
+      Reminder(id: 'r2', text: 'Replace smoke alarm batteries', frequency: 'Every 6 months', dueDate: DateTime(2026, 3, 31)),
+      Reminder(id: 'r3', text: 'Check fire extinguisher', frequency: 'Yearly', dueDate: DateTime(2026, 1, 14)),
+      Reminder(id: 'r4', text: 'Clean dryer lint trap', frequency: 'Weekly', dueDate: DateTime(2025, 10, 24)),
     ]);
   }
 
@@ -80,6 +83,11 @@ class AppState extends ChangeNotifier {
 
   void addContact(Contact c) {
     contacts.add(c);
+    notifyListeners();
+  }
+
+  void removeContact(Contact c) {
+    contacts.removeWhere((x) => x.name == c.name && x.phone == c.phone);
     notifyListeners();
   }
 

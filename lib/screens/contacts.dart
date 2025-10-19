@@ -25,13 +25,7 @@ class ContactsScreen extends StatelessWidget {
           )).toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // stub add contact
-          app.addContact(Contact(name: 'New Contact', phone: '555-000-0000'));
-        },
-        child: const Icon(Icons.add),
-      ),
+      
     );
   }
 }
