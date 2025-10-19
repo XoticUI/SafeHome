@@ -89,4 +89,11 @@ class AppState extends ChangeNotifier {
     room.items.add(ChecklistItem(id: id, text: text));
     notifyListeners();
   }
+
+  void addRoom(String name) {
+    final id = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    if (rooms.any((r) => r.id == id)) return;
+    rooms.add(Room(id: id, name: name, items: []));
+    notifyListeners();
+  }
 }
