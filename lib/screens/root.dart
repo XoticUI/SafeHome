@@ -20,9 +20,29 @@ class _RootScreenState extends State<RootScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 96,
+        // show big centered title only on Home tab; no title on other tabs
         title: _index == 0
-            ? const Center(child: Text('SafeHome', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600)))
-            : const Text('SafeHome', style: TextStyle(fontSize: 20)),
+            ? Center(
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  // attempt to load the bundled logo; if missing, show a fallback icon
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 40,
+                    height: 40,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(color: Colors.blueGrey.shade900, borderRadius: BorderRadius.circular(8)),
+                        child: const Icon(Icons.security, color: Colors.white, size: 22),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('SafeHome', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600)),
+                ]),
+              )
+            : null,
         automaticallyImplyLeading: false,
       ),
       body: AnimatedBuilder(
@@ -59,7 +79,7 @@ class _RootScreenState extends State<RootScreen> {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              Text('${(app.overallScore() * 100).round()}%', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
+                              Text('${(app.overallScore() * 100).round()}', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
                               const Spacer(),
                               Text('Needs Attention', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
                             ],
@@ -78,7 +98,7 @@ class _RootScreenState extends State<RootScreen> {
                             ],
                           ),
                         ],
-                      ),
+                      ), 
                     ),
                   ),
 
@@ -129,7 +149,7 @@ class _RootScreenState extends State<RootScreen> {
 
                   const SizedBox(height: 18),
 
-                  // Start Safety Check button (full width)
+                  // safety check button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -177,7 +197,7 @@ class _RootScreenState extends State<RootScreen> {
                 const Center(child: Text('Check each room in your home', style: TextStyle(color: Colors.grey))),
                 const SizedBox(height: 12),
 
-                // Accordion of rooms
+                // room things
                 Expanded(
                   child: SingleChildScrollView(
                     child: ExpansionPanelList.radio(
@@ -226,17 +246,45 @@ class _RootScreenState extends State<RootScreen> {
                             );
                           },
                           body: Column(
-                            children: room.items.map((item) {
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    leading: Checkbox(value: item.done, onChanged: (_) => app.toggleItem(room.id, item.id)),
-                                    title: Text(item.text),
-                                  ),
-                                  const Divider(height: 0),
-                                ],
-                              );
-                            }).toList(),
+                            children: [
+                              // existing items
+                              ...room.items.map((item) {
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      leading: Checkbox(value: item.done, onChanged: (_) => app.toggleItem(room.id, item.id)),
+                                      title: Text(item.text),
+                                    ),
+                                    const Divider(height: 0),
+                                  ],
+                                );
+                              }).toList(),
+
+                              // Add item action shown at the bottom of the expanded panel
+                              ListTile(
+                                leading: const Icon(Icons.add_circle_outline, color: Colors.blue),
+                                title: const Text('Add item', style: TextStyle(fontWeight: FontWeight.w600)),
+                                onTap: () async {
+                                  final controller = TextEditingController();
+                                  final result = await showDialog<String>(
+                                    context: context,
+                                    builder: (dctx) {
+                                      return AlertDialog(
+                                        title: const Text('Add checklist item'),
+                                        content: TextField(controller: controller, autofocus: true, decoration: const InputDecoration(hintText: 'e.g. Test smoke alarm')),
+                                        actions: [
+                                          TextButton(onPressed: () => Navigator.of(dctx).pop(), child: const Text('Cancel')),
+                                          ElevatedButton(onPressed: () => Navigator.of(dctx).pop(controller.text.trim()), child: const Text('Add')),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  if (result != null && result.isNotEmpty) {
+                                    app.addChecklistItem(room.id, result);
+                                  }
+                                },
+                              ),
+                            ],
                           ),
                         );
                       }).toList(),
@@ -268,8 +316,8 @@ class _RootScreenState extends State<RootScreen> {
                           final isDueSoon = daysLeft != null && daysLeft <= 7;
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: isDueSoon ? Colors.amber.shade300 : Colors.grey.shade200)),
-                            color: isDueSoon ? Colors.yellow.shade50 : null,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
@@ -411,10 +459,10 @@ class _RootScreenState extends State<RootScreen> {
                     const Text('Quick access to help', style: TextStyle(fontSize: 16, color: Colors.grey)),
                     const SizedBox(height: 18),
 
-                    // Alert card
+                    // Alert card (white background, no border)
                     Card(
-                      color: Colors.red.shade50,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.red.shade200)),
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
@@ -428,10 +476,10 @@ class _RootScreenState extends State<RootScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // 911 card with red call button
+                    // 911 card with red call button (white background, no border)
                     Card(
-                      color: Colors.red.shade50,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.red.shade200)),
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
@@ -478,7 +526,8 @@ class _RootScreenState extends State<RootScreen> {
                           final c = app.contacts[i];
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
