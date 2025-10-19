@@ -1,6 +1,10 @@
 # safehome
 
-A new Flutter project.
+
+A app based on Flutter.
+Made for Congressional App Challenge.
+
+Made by Changhyung Lee & Jason Lim
 
 ## Getting Started
 
