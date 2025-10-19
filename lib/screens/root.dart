@@ -20,11 +20,11 @@ class _RootScreenState extends State<RootScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 96,
-        // show big centered title only on Home tab; no title on other tabs
+        // TITLE
         title: _index == 0
             ? Center(
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  // attempt to load the bundled logo; if missing, show a fallback icon
+                  // LOGO IF NOT, USE ALTERNATIVE
                   Image.asset(
                     'assets/images/logo.png',
                     width: 40,
@@ -48,15 +48,15 @@ class _RootScreenState extends State<RootScreen> {
       body: AnimatedBuilder(
         animation: app,
   builder: (context, _) {
-          // rebuild pages based on latest app state
-          // Build pages: 0=Home, 1=Checks, 2=Reminders, 3=Emergency/Contacts
+          // pages
+          // 0 - home, 1 - checklist, 2 - reminder, 3 - emergency
           final homePage = SizedBox.expand(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Large safety score card
+                  // safety card
                   Card(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200)),
                     child: Padding(
@@ -104,7 +104,7 @@ class _RootScreenState extends State<RootScreen> {
 
                   const SizedBox(height: 18),
 
-                  // Two small stat cards
+                  // stats box main
                   Row(
                     children: [
                       Expanded(
@@ -165,7 +165,7 @@ class _RootScreenState extends State<RootScreen> {
 
                   const SizedBox(height: 18),
 
-                  // Safety Tip card
+                  // safety box 2
                   Card(
                     color: Colors.blue.shade50,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.blue.shade100)),
@@ -260,7 +260,7 @@ class _RootScreenState extends State<RootScreen> {
                                 );
                               }).toList(),
 
-                              // Add item action shown at the bottom of the expanded panel
+                              // item action stuf
                               ListTile(
                                 leading: const Icon(Icons.add_circle_outline, color: Colors.blue),
                                 title: const Text('Add item', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -459,7 +459,7 @@ class _RootScreenState extends State<RootScreen> {
                     const Text('Quick access to help', style: TextStyle(fontSize: 16, color: Colors.grey)),
                     const SizedBox(height: 18),
 
-                    // Alert card (white background, no border)
+                    // alert ui - white
                     Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -476,7 +476,7 @@ class _RootScreenState extends State<RootScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // 911 card with red call button (white background, no border)
+                    // 911 border thing
                     Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -497,7 +497,7 @@ class _RootScreenState extends State<RootScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // red call FAB style button on the card
+                            // red call button box
                             Container(
                               decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4))]),
                               child: Material(
@@ -505,7 +505,7 @@ class _RootScreenState extends State<RootScreen> {
                                 shape: const CircleBorder(),
                                 child: IconButton(
                                   onPressed: () {
-                                    // stub: integrate with phone call plugin if desired
+                                    // for future integration with actual calling.
                                   },
                                   icon: const Icon(Icons.call, color: Colors.white),
                                 ),
@@ -518,7 +518,7 @@ class _RootScreenState extends State<RootScreen> {
 
                     const SizedBox(height: 12),
 
-                    // Contacts list
+                    // contacts
                     Expanded(
                       child: ListView.builder(
                         itemCount: app.contacts.length,
@@ -549,7 +549,7 @@ class _RootScreenState extends State<RootScreen> {
                                   Container(
                                     decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))]),
                                     child: Material(
-                                      color: Colors.green, // green call
+                                      color: Colors.green, // call button
                                       shape: const CircleBorder(),
                                       child: IconButton(
                                         onPressed: () {
