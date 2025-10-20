@@ -44,7 +44,7 @@ class AppState extends ChangeNotifier {
 
     contacts.addAll([
       Contact(name: 'Primary Contact', phone: '555-123-4567'),
-      Contact(name: 'Emergency Services', phone: '911'),
+      Contact(name: 'Emergency Services', phone: '911', protected: true),
     ]);
 
     reminders.addAll([
@@ -87,7 +87,8 @@ class AppState extends ChangeNotifier {
   }
 
   void removeContact(Contact c) {
-    contacts.removeWhere((x) => x.name == c.name && x.phone == c.phone);
+    // do not remove protected contacts (e.g. 911)
+    contacts.removeWhere((x) => !(x.protected) && x.name == c.name && x.phone == c.phone);
     notifyListeners();
   }
 

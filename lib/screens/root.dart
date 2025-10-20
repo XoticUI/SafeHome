@@ -11,7 +11,25 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   int _index = 0;
+  late final PageController _pageController;
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _index);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goTo(int i) {
+    if (i == _index) return;
+    setState(() => _index = i);
+    _pageController.animateToPage(i, duration: const Duration(milliseconds: 350), curve: Curves.easeInOut);
+  }
   @override
   Widget build(BuildContext context) {
     final app = AppState.instance;
@@ -20,29 +38,28 @@ class _RootScreenState extends State<RootScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 96,
-        // show big centered title only on Home tab; no title on other tabs
-        title: _index == 0
-            ? Center(
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  // attempt to load the bundled logo; if missing, show a fallback icon
-                  Image.asset(
-                    'assets/images/logo.png',
-                    width: 40,
-                    height: 40,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(color: Colors.blueGrey.shade900, borderRadius: BorderRadius.circular(8)),
-                        child: const Icon(Icons.security, color: Colors.white, size: 22),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('SafeHome', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600)),
-                ]),
-              )
-            : null,
+        // animated title: big centered title only on Home tab; empty otherwise
+        title: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: _index == 0
+              ? Center(
+                  key: const ValueKey('homeTitle'),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    // logo placeholder (use icon so missing asset won't break build)
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(color: Colors.blueGrey.shade900, borderRadius: BorderRadius.circular(8)),
+                      child: const Icon(Icons.security, color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('SafeHome', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600)),
+                  ]),
+                )
+              : const SizedBox.shrink(key: ValueKey('emptyTitle')),
+        ),
         automaticallyImplyLeading: false,
       ),
       body: AnimatedBuilder(
@@ -258,7 +275,7 @@ class _RootScreenState extends State<RootScreen> {
                                     const Divider(height: 0),
                                   ],
                                 );
-                              }).toList(),
+                              }),
 
                               // Add item action shown at the bottom of the expanded panel
                               ListTile(
@@ -312,7 +329,7 @@ class _RootScreenState extends State<RootScreen> {
                         itemCount: app.reminders.length,
                         itemBuilder: (context, i) {
                           final r = app.reminders[i];
-                          final daysLeft = r.dueDate != null ? r.dueDate!.difference(DateTime.now()).inDays : null;
+                          final daysLeft = r.dueDate?.difference(DateTime.now()).inDays;
                           final isDueSoon = daysLeft != null && daysLeft <= 7;
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -345,7 +362,7 @@ class _RootScreenState extends State<RootScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                       decoration: BoxDecoration(color: Colors.yellow.shade100, borderRadius: BorderRadius.circular(8)),
-                                      child: Text('Due in ${daysLeft} days', style: TextStyle(color: Colors.grey.shade800)),
+                                      child: Text('Due in $daysLeft days', style: TextStyle(color: Colors.grey.shade800)),
                                     ),
                                   ],
                                 ],
@@ -459,7 +476,7 @@ class _RootScreenState extends State<RootScreen> {
                     const Text('Quick access to help', style: TextStyle(fontSize: 16, color: Colors.grey)),
                     const SizedBox(height: 18),
 
-                    // Alert card (white background, no border)
+                    // whitebg
                     Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -476,7 +493,7 @@ class _RootScreenState extends State<RootScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // 911 card with red call button (white background, no border)
+                    // 911 call
                     Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -497,7 +514,7 @@ class _RootScreenState extends State<RootScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // red call FAB style button on the card
+                            // bg 911
                             Container(
                               decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4))]),
                               child: Material(
@@ -560,13 +577,18 @@ class _RootScreenState extends State<RootScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  // delete icon
-                                  IconButton(
-                                    onPressed: () {
-                                      app.removeContact(c);
-                                    },
-                                    icon: Icon(Icons.delete_outline, color: Colors.grey.shade600),
-                                  ),
+                                  // delete icon (hidden for protected contacts)
+                                  c.protected
+                                      ? const Padding(
+                                          padding: EdgeInsets.only(left: 8.0),
+                                          child: Icon(Icons.lock_outline, color: Colors.grey),
+                                        )
+                                      : IconButton(
+                                          onPressed: () {
+                                            app.removeContact(c);
+                                          },
+                                          icon: Icon(Icons.delete_outline, color: Colors.grey.shade600),
+                                        ),
                                 ],
                               ),
                             ),
@@ -624,7 +646,12 @@ class _RootScreenState extends State<RootScreen> {
             ],
           );
 
-          return IndexedStack(index: _index, children: [homePage, checksPage, remindersPage, emergencyPage]);
+          // Use a PageView so transitions between tabs animate (slide) and pages keep state
+          return PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [homePage, checksPage, remindersPage, emergencyPage],
+          );
         },
       ),
       bottomNavigationBar: SafeArea(
@@ -657,26 +684,32 @@ class _RootScreenState extends State<RootScreen> {
 
               return Expanded(
                 child: InkWell(
-                  onTap: () => setState(() => _index = i),
+                  onTap: () => _goTo(i),
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
                         child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.all(8),
-                          decoration: selected
-                              ? BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12))
-                              : null,
+                          decoration: BoxDecoration(
+                            color: selected ? Colors.black87 : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: Builder(builder: (context) {
-                            // color to green
-              final iconColor = selected
-                ? (i == 1
-                  ? const Color(0xFF24E61A)
-                  : (i == 3 ? Colors.redAccent : Colors.white))
-                : Colors.grey[700];
-                            return Icon(icon, color: iconColor);
+                            final iconColor = selected
+                              ? (i == 1
+                                ? const Color(0xFF24E61A)
+                                : (i == 3 ? Colors.redAccent : Colors.white))
+                              : Colors.grey[700];
+                            return AnimatedScale(
+                              scale: selected ? 1.12 : 1.0,
+                              duration: const Duration(milliseconds: 200),
+                              child: Icon(icon, color: iconColor),
+                            );
                           }),
                         ),
                         const SizedBox(height: 6),
@@ -690,9 +723,14 @@ class _RootScreenState extends State<RootScreen> {
           ),
         ),
       ),
-      floatingActionButton: _index == 1
-          ? FloatingActionButton(
-              onPressed: () async {
+      floatingActionButton: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOutBack,
+        switchOutCurve: Curves.easeIn,
+        child: _index == 1
+            ? FloatingActionButton(
+                key: const ValueKey('fab_checks'),
+                onPressed: () async {
                 final result = await showDialog<String>(
                   context: context,
                   builder: (context) {
@@ -710,10 +748,11 @@ class _RootScreenState extends State<RootScreen> {
                 if (result != null && result.trim().isNotEmpty) {
                   app.addRoom(result.trim());
                 }
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
+                },
+                child: const Icon(Icons.add),
+              )
+            : const SizedBox.shrink(key: ValueKey('no_fab')),
+      ),
     );
   }
 }

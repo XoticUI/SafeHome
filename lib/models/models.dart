@@ -27,6 +27,7 @@ class Contact {
   final String name;
   final String phone;
   final String? role;
+  final bool protected;
 
-  Contact({required this.name, required this.phone, this.role});
+  Contact({required this.name, required this.phone, this.role, this.protected = false});
 }
