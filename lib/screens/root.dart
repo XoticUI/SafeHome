@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../state/app_state.dart';
 import '../models/models.dart';
 
@@ -25,10 +26,14 @@ class _RootScreenState extends State<RootScreen> {
     super.dispose();
   }
 
-  void _goTo(int i) {
+  void _goTo(int i, {bool animate = true}) {
     if (i == _index) return;
     setState(() => _index = i);
-    _pageController.animateToPage(i, duration: const Duration(milliseconds: 350), curve: Curves.easeInOut);
+    if (animate) {
+      _pageController.animateToPage(i, duration: const Duration(milliseconds: 350), curve: Curves.easeInOut);
+    } else {
+      _pageController.jumpToPage(i);
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -169,8 +174,8 @@ class _RootScreenState extends State<RootScreen> {
                   // safety check button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => _index = 1),
+          child: ElevatedButton(
+            onPressed: () => _goTo(1, animate: false),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 24.0),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -521,8 +526,14 @@ class _RootScreenState extends State<RootScreen> {
                                 color: const Color.fromARGB(255, 249, 7, 7),
                                 shape: const CircleBorder(),
                                 child: IconButton(
-                                  onPressed: () {
-                                    // stub: integrate with phone call plugin if desired
+                                  onPressed: () async {
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    final uri = Uri(scheme: 'tel', path: '911');
+                                    try {
+                                      await launchUrl(uri);
+                                    } catch (_) {
+                                      messenger.showSnackBar(const SnackBar(content: Text('Unable to place call')));
+                                    }
                                   },
                                   icon: const Icon(Icons.call, color: Colors.white),
                                 ),
@@ -569,8 +580,18 @@ class _RootScreenState extends State<RootScreen> {
                                       color: Colors.green, // green call
                                       shape: const CircleBorder(),
                                       child: IconButton(
-                                        onPressed: () {
-                                          // stub: integrate phone call
+                                        onPressed: () async {
+                                          final messenger = ScaffoldMessenger.of(context);
+                                          final raw = c.phone.trim();
+                                          if (raw.isEmpty) return;
+                                          // normalize phone number (basic)
+                                          final digits = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+                                          final uri = Uri(scheme: 'tel', path: digits);
+                                          try {
+                                            await launchUrl(uri);
+                                          } catch (_) {
+                                            messenger.showSnackBar(const SnackBar(content: Text('Unable to place call')));
+                                          }
                                         },
                                         icon: const Icon(Icons.call, color: Colors.white),
                                       ),
