@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+Congressional App Challenge Submission - 2025
+Changhyung Lee & Jason Lim
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
